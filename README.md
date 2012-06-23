@@ -13,7 +13,7 @@ like this:
 		assert.number(options.id, 'options.id);
 		assert.bool(options.isManager, 'options.isManager');
 		assert.string(options.name, 'options.name');
-		assert.array(options.email, 'string', 'options.email');
+		assert.arrayOfString(options.email, 'options.email');
 		assert.func(callback, 'callback');
 
         // Do stuff
