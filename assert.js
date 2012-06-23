@@ -140,9 +140,13 @@ Object.keys(module.exports).forEach(function (k) {
 
 Object.keys(module.exports).forEach(function (k) {
         var _name = 'optional' + capitalize(k);
-        module.exports[_name] = function (arg, type, name) {
+        if (k === 'bool')
+                k = 'boolean';
+        if (k === 'func')
+                k = 'function';
+        module.exports[_name] = function (arg, name) {
                 if (!NDEBUG && arg !== undefined) {
-                        _assert(arg, type, name);
+                        _assert(arg, k, name);
                 }
         };
 });
