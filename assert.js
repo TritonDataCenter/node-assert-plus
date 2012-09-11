@@ -1,6 +1,7 @@
 // Copyright (c) 2012, Mark Cavage. All rights reserved.
 
 var assert = require('assert');
+var Stream = require('stream').Stream;
 var util = require('util');
 
 
@@ -105,6 +106,19 @@ function object(arg, name) {
 }
 
 
+function stream(arg, name) {
+        if (!(arg instanceof Stream)) {
+                throw new assert.AssertionError({
+                        message: _(TYPE_REQUIRED, name, type),
+                        actual: typeof (arg),
+                        expected: 'Stream',
+                        operator: 'instanceof',
+                        stackStartFunction: buffer
+                });
+        }
+}
+
+
 function string(arg, name) {
         _assert(arg, 'string', name);
 }
@@ -119,6 +133,7 @@ module.exports = {
         func: func,
         number: number,
         object: object,
+        stream: stream,
         string: string
 };
 
