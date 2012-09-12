@@ -25,6 +25,10 @@ function capitalize(str) {
         return (str.charAt(0).toUpperCase() + str.slice(1));
 }
 
+function uncapitalize(str) {
+        return (str.charAt(0).toLowerCase() + str.slice(1));
+}
+
 function _() {
         return (util.format.apply(util, arguments));
 }
@@ -155,15 +159,25 @@ Object.keys(module.exports).forEach(function (k) {
 
 Object.keys(module.exports).forEach(function (k) {
         var _name = 'optional' + capitalize(k);
-        if (k === 'bool')
-                k = 'boolean';
-        if (k === 'func')
-                k = 'function';
-        module.exports[_name] = function (arg, name) {
-                if (!NDEBUG && arg !== undefined) {
-                        _assert(arg, k, name);
-                }
-        };
+        var s = uncapitalize(k.replace('arrayOf', ''));
+        if (s === 'bool')
+                s = 'boolean';
+        if (s === 'func')
+                s = 'function';
+
+        if (k.indexOf('arrayOf') !== -1) {
+          module.exports[_name] = function (arg, name) {
+                  if (!NDEBUG && arg !== undefined) {
+                          array(arg, s, name);
+                  }
+          };
+        } else {
+          module.exports[_name] = function (arg, name) {
+                  if (!NDEBUG && arg !== undefined) {
+                          _assert(arg, s, name);
+                  }
+          };
+        }
 });
 
 
