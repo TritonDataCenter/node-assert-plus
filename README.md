@@ -1,4 +1,4 @@
-# node-assert-extra
+# node-assert-plus
 
 This library is a super small wrapper over node's assert module that has two
 things: (1) the ability to disable assertions with the environment variable
