@@ -108,7 +108,7 @@ function bool(arg, name) {
 function buffer(arg, name) {
         if (!Buffer.isBuffer(arg)) {
                 throw new assert.AssertionError({
-                        message: _(TYPE_REQUIRED, name, type),
+                        message: _(TYPE_REQUIRED, name || '', 'Buffer'),
                         actual: typeof (arg),
                         expected: 'buffer',
                         operator: 'Buffer.isBuffer',
