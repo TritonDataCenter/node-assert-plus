@@ -3,6 +3,7 @@
   "name": "assert-plus",
   "description": "Extra assertions on top of node's assert module",
   "version": "0.1.5",
+  "license": "MIT",
   "main": "./assert.js",
   "devDependencies": {},
   "optionalDependencies": {},
