@@ -22,6 +22,22 @@ var TYPE_REQUIRED = '%s (%s) is required';
 
 ///--- Internal
 
+function normalize(s) {
+	switch (s) {
+		case 'func': s = 'function'; break;
+		case 'bool': s = 'boolean'; break;
+	}
+	return s;
+}
+
+function denormalize(s) {
+	switch (s) {
+		case 'function': s = 'func'; break;
+		case 'boolean': s = 'bool'; break;
+	}
+	return s;
+}
+
 function capitalize(str) {
         return (str.charAt(0).toUpperCase() + str.slice(1));
 }
@@ -36,67 +52,61 @@ function _() {
 
 
 function _assert(arg, type, name, stackFunc) {
-        if (!NDEBUG) {
-                name = name || type;
-                stackFunc = stackFunc || _assert.caller;
-                var t = typeof (arg);
+	name = name || type;
+	stackFunc = stackFunc || _assert.caller;
+	var t = typeof (arg);
 
-                if (t !== type) {
-                        throw new assert.AssertionError({
-                                message: _(TYPE_REQUIRED, name, type),
-                                actual: t,
-                                expected: type,
-                                operator: '===',
-                                stackStartFunction: stackFunc
-                        });
-                }
-        }
+	if (t !== type) {
+		throw new assert.AssertionError({
+			message: _(TYPE_REQUIRED, name, type),
+			actual: t,
+			expected: type,
+			operator: '===',
+			stackStartFunction: stackFunc
+		});
+	}
 }
 
 
 function _instanceof(arg, type, name, stackFunc) {
-        if (!NDEBUG) {
-                name = name || type;
-                stackFunc = stackFunc || _instanceof.caller;
+	name = name || type;
+	stackFunc = stackFunc || _instanceof.caller;
 
-                if (!(arg instanceof type)) {
-                        throw new assert.AssertionError({
-                                message: _(TYPE_REQUIRED, name, type.name),
-                                actual: _getClass(arg),
-                                expected: type.name,
-                                operator: 'instanceof',
-                                stackStartFunction: stackFunc
-                        });
-                }
-        }
+	if (!(arg instanceof type)) {
+		throw new assert.AssertionError({
+			message: _(TYPE_REQUIRED, name, type.name),
+			actual: _getClass(arg),
+			expected: type.name,
+			operator: 'instanceof',
+			stackStartFunction: stackFunc
+		});
+	}
 }
 
 function _getClass(object) {
         return (Object.prototype.toString.call(object).slice(8, -1));
-};
+}
 
 
 
 ///--- API
 
 function array(arr, type, name) {
-        if (!NDEBUG) {
-                name = name || type;
+	name = name || type;
 
-                if (!Array.isArray(arr)) {
-                        throw new assert.AssertionError({
-                                message: _(ARRAY_TYPE_REQUIRED, name, type),
-                                actual: typeof (arr),
-                                expected: 'array',
-                                operator: 'Array.isArray',
-                                stackStartFunction: array.caller
-                        });
-                }
+	if (!Array.isArray(arr)) {
+		throw new assert.AssertionError({
+			message: _(ARRAY_TYPE_REQUIRED, name, type),
+			actual: typeof (arr),
+			expected: 'array',
+			operator: 'Array.isArray',
+			stackStartFunction: array.caller
+		});
+	}
 
-                for (var i = 0; i < arr.length; i++) {
-                        _assert(arr[i], type, name, array);
-                }
-        }
+	for (var i = 0; i < arr.length; i++) {
+		module.exports[denormalize(type)](arr[i], name);
+	}
 }
 
 
@@ -125,7 +135,7 @@ function func(arg, name) {
 
 function number(arg, name) {
         _assert(arg, 'number', name);
-        if (!NDEBUG && (isNaN(arg) || !isFinite(arg))) {
+        if ((isNaN(arg) || !isFinite(arg))) {
                 throw new assert.AssertionError({
                         message: _(TYPE_REQUIRED, name, 'number'),
                         actual: arg,
@@ -163,7 +173,7 @@ function string(arg, name) {
 
 function uuid(arg, name) {
         string(arg, name);
-        if (!NDEBUG && !UUID_REGEXP.test(arg)) {
+        if (!UUID_REGEXP.test(arg)) {
                 throw new assert.AssertionError({
                         message: _(TYPE_REQUIRED, name, 'uuid'),
                         actual: 'string',
@@ -177,7 +187,7 @@ function uuid(arg, name) {
 
 ///--- Exports
 
-module.exports = {
+var funcs = {
         bool: bool,
         buffer: buffer,
         date: date,
@@ -190,43 +200,47 @@ module.exports = {
         uuid: uuid
 };
 
+module.exports = function () {
+	if (NDEBUG)
+		return;
+	assert.ok.apply(assert, arguments);
+};
 
-Object.keys(module.exports).forEach(function (k) {
-        if (k === 'buffer')
-                return;
+// add arrayOf* methods
+Object.keys(funcs).forEach(function (k) {
+	module.exports[k] = function () {
+		if (NDEBUG)
+			return;
+		funcs[k].apply(null, arguments);
+	};
 
         var name = 'arrayOf' + capitalize(k);
 
-        if (k === 'bool')
-                k = 'boolean';
-        if (k === 'func')
-                k = 'function';
         module.exports[name] = function (arg, name) {
-                array(arg, k, name);
+		if (NDEBUG)
+			return;
+                array(arg, normalize(k), name);
         };
 });
 
+// add optional* methods
 Object.keys(module.exports).forEach(function (k) {
         var _name = 'optional' + capitalize(k);
-        var s = uncapitalize(k.replace('arrayOf', ''));
-        if (s === 'bool')
-                s = 'boolean';
-        if (s === 'func')
-                s = 'function';
+        var s = normalize(uncapitalize(k.replace('arrayOf', '')));
 
-        if (k.indexOf('arrayOf') !== -1) {
-          module.exports[_name] = function (arg, name) {
-                  if (!NDEBUG && arg !== undefined) {
-                          array(arg, s, name);
-                  }
-          };
-        } else {
-          module.exports[_name] = function (arg, name) {
-                  if (!NDEBUG && arg !== undefined) {
-                          _assert(arg, s, name);
-                  }
-          };
-        }
+	if (k.indexOf('arrayOf') !== -1) {
+		module.exports[_name] = function (arg, name) {
+			if (!NDEBUG && arg !== undefined) {
+				array(arg, s, name);
+			}
+		};
+	} else {
+		module.exports[_name] = function (arg, name) {
+			if (!NDEBUG && arg !== undefined) {
+				module.exports[k](arg, name);
+			}
+		};
+	}
 });
 
 
@@ -238,8 +252,8 @@ Object.keys(assert).forEach(function (k) {
         }
 
         module.exports[k] = function () {
-                if (!NDEBUG) {
-                        assert[k].apply(assert[k], arguments);
-                }
+                if (NDEBUG)
+			return;
+		assert[k].apply(assert[k], arguments);
         };
 });

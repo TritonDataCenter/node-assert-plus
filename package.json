@@ -7,6 +7,9 @@
   "main": "./assert.js",
   "devDependencies": {},
   "optionalDependencies": {},
+  "scripts": {
+    "test": "for f in ./tests/*.js; do echo \"$f\"; node \"$f\" || exit 1; done"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/mcavage/node-assert-plus.git"
