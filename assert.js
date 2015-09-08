@@ -8,7 +8,6 @@ var util = require('util');
 
 ///--- Globals
 
-var NDEBUG = process.env.NODE_NDEBUG || false;
 var UUID_REGEXP = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
 
 
@@ -36,67 +35,61 @@ function _() {
 
 
 function _assert(arg, type, name, stackFunc) {
-        if (!NDEBUG) {
-                name = name || type;
-                stackFunc = stackFunc || _assert.caller;
-                var t = typeof (arg);
+	name = name || type;
+	stackFunc = stackFunc || _assert.caller;
+	var t = typeof (arg);
 
-                if (t !== type) {
-                        throw new assert.AssertionError({
-                                message: _(TYPE_REQUIRED, name, type),
-                                actual: t,
-                                expected: type,
-                                operator: '===',
-                                stackStartFunction: stackFunc
-                        });
-                }
-        }
+	if (t !== type) {
+		throw new assert.AssertionError({
+			message: _(TYPE_REQUIRED, name, type),
+			actual: t,
+			expected: type,
+			operator: '===',
+			stackStartFunction: stackFunc
+		});
+	}
 }
 
 
 function _instanceof(arg, type, name, stackFunc) {
-        if (!NDEBUG) {
-                name = name || type;
-                stackFunc = stackFunc || _instanceof.caller;
+	name = name || type;
+	stackFunc = stackFunc || _instanceof.caller;
 
-                if (!(arg instanceof type)) {
-                        throw new assert.AssertionError({
-                                message: _(TYPE_REQUIRED, name, type.name),
-                                actual: _getClass(arg),
-                                expected: type.name,
-                                operator: 'instanceof',
-                                stackStartFunction: stackFunc
-                        });
-                }
-        }
+	if (!(arg instanceof type)) {
+		throw new assert.AssertionError({
+			message: _(TYPE_REQUIRED, name, type.name),
+			actual: _getClass(arg),
+			expected: type.name,
+			operator: 'instanceof',
+			stackStartFunction: stackFunc
+		});
+	}
 }
 
 function _getClass(object) {
         return (Object.prototype.toString.call(object).slice(8, -1));
-};
+}
 
 
 
 ///--- API
 
 function array(arr, type, name) {
-        if (!NDEBUG) {
-                name = name || type;
+	name = name || type;
 
-                if (!Array.isArray(arr)) {
-                        throw new assert.AssertionError({
-                                message: _(ARRAY_TYPE_REQUIRED, name, type),
-                                actual: typeof (arr),
-                                expected: 'array',
-                                operator: 'Array.isArray',
-                                stackStartFunction: array.caller
-                        });
-                }
+	if (!Array.isArray(arr)) {
+		throw new assert.AssertionError({
+			message: _(ARRAY_TYPE_REQUIRED, name, type),
+			actual: typeof (arr),
+			expected: 'array',
+			operator: 'Array.isArray',
+			stackStartFunction: array.caller
+		});
+	}
 
-                for (var i = 0; i < arr.length; i++) {
-                        _assert(arr[i], type, name, array);
-                }
-        }
+	for (var i = 0; i < arr.length; i++) {
+		_assert(arr[i], type, name, array);
+	}
 }
 
 
@@ -125,7 +118,7 @@ function func(arg, name) {
 
 function number(arg, name) {
         _assert(arg, 'number', name);
-        if (!NDEBUG && (isNaN(arg) || !isFinite(arg))) {
+        if (isNaN(arg) || !isFinite(arg)) {
                 throw new assert.AssertionError({
                         message: _(TYPE_REQUIRED, name, 'number'),
                         actual: arg,
@@ -163,7 +156,7 @@ function string(arg, name) {
 
 function uuid(arg, name) {
         string(arg, name);
-        if (!NDEBUG && !UUID_REGEXP.test(arg)) {
+        if (!UUID_REGEXP.test(arg)) {
                 throw new assert.AssertionError({
                         message: _(TYPE_REQUIRED, name, 'uuid'),
                         actual: 'string',
@@ -175,9 +168,7 @@ function uuid(arg, name) {
 }
 
 
-///--- Exports
-
-module.exports = {
+var funcs = {
         bool: bool,
         buffer: buffer,
         date: date,
@@ -190,56 +181,77 @@ module.exports = {
         uuid: uuid
 };
 
+///--- Exports
 
-Object.keys(module.exports).forEach(function (k) {
-        if (k === 'buffer')
-                return;
+module.exports._setExports = _setExports;
+_setExports(module.exports);
 
-        var name = 'arrayOf' + capitalize(k);
+function _setExports(o, ndebug) {
+	if (ndebug === undefined)
+		ndebug = process.env.NODE_NDEBUG;
 
-        if (k === 'bool')
-                k = 'boolean';
-        if (k === 'func')
-                k = 'function';
-        module.exports[name] = function (arg, name) {
-                array(arg, k, name);
-        };
-});
+	var keys = Object.keys(funcs);
 
-Object.keys(module.exports).forEach(function (k) {
-        var _name = 'optional' + capitalize(k);
-        var s = uncapitalize(k.replace('arrayOf', ''));
-        if (s === 'bool')
-                s = 'boolean';
-        if (s === 'func')
-                s = 'function';
+	Object.keys(funcs).forEach(function (k) {
+		var func = funcs[k];
+		o[k] = function () {
+			if (ndebug)
+				return;
+			func.apply(null, arguments);
+		};
 
-        if (k.indexOf('arrayOf') !== -1) {
-          module.exports[_name] = function (arg, name) {
-                  if (!NDEBUG && arg !== undefined) {
-                          array(arg, s, name);
-                  }
-          };
-        } else {
-          module.exports[_name] = function (arg, name) {
-                  if (!NDEBUG && arg !== undefined) {
-                          _assert(arg, s, name);
-                  }
-          };
-        }
-});
+		if (k === 'buffer')
+			return;
+
+		var name = 'arrayOf' + capitalize(k);
+
+		if (k === 'bool')
+			k = 'boolean';
+		if (k === 'func')
+			k = 'function';
+		o[name] = function (arg, name) {
+			if (ndebug)
+				return;
+			array(arg, k, name);
+		};
+		keys.push(name);
+	});
+
+	keys.forEach(function (k) {
+		var _name = 'optional' + capitalize(k);
+		var s = uncapitalize(k.replace('arrayOf', ''));
+		if (s === 'bool')
+			s = 'boolean';
+		if (s === 'func')
+			s = 'function';
+
+		if (k.indexOf('arrayOf') !== -1) {
+			o[_name] = function (arg, name) {
+				if (!ndebug && arg !== undefined) {
+					array(arg, s, name);
+				}
+			};
+		} else {
+			o[_name] = function (arg, name) {
+				if (!ndebug && arg !== undefined) {
+					_assert(arg, s, name);
+				}
+			};
+		}
+	});
 
 
-// Reexport built-in assertions
-Object.keys(assert).forEach(function (k) {
-        if (k === 'AssertionError') {
-                module.exports[k] = assert[k];
-                return;
-        }
+	// Reexport built-in assertions
+	Object.keys(assert).forEach(function (k) {
+		if (k === 'AssertionError') {
+			o[k] = assert[k];
+			return;
+		}
 
-        module.exports[k] = function () {
-                if (!NDEBUG) {
-                        assert[k].apply(assert[k], arguments);
-                }
-        };
-});
+		o[k] = function () {
+			if (ndebug)
+				return;
+			assert[k].apply(assert[k], arguments);
+		};
+	});
+}
