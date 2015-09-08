@@ -5,8 +5,13 @@
   "version": "0.1.5",
   "license": "MIT",
   "main": "./assert.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "tape": "4.2.0"
+  },
   "optionalDependencies": {},
+  "scripts": {
+    "test": "./node_modules/.bin/tape tests/*.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/mcavage/node-assert-plus.git"
