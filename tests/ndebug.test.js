@@ -1,10 +1,14 @@
-process.env.NODE_NDEBUG = 1;
-
 var f = require('util').format;
 
 var test = require('tape');
 
 var assertPlus = require('../');
+
+var ndebug = process.env.NODE_NDEBUG;
+test('ndebug.test setup', function (t) {
+	delete process.env.NODE_NDEBUG;
+	t.end();
+});
 
 test('ndebug', function (t) {
 	// ensure all exports on "assert-plus" that are functions
@@ -21,5 +25,10 @@ test('ndebug', function (t) {
 		});
 	});
 
+	t.end();
+});
+
+test('ndebug.test teardown', function (t) {
+	process.env.NODE_NDEBUG = ndebug;
 	t.end();
 });

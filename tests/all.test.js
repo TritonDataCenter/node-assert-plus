@@ -5,7 +5,6 @@ var test = require('tape');
 
 var assertPlus = require('../');
 
-
 function capitalize(s) {
 	return s[0].toUpperCase() + s.substr(1);
 }
@@ -237,9 +236,9 @@ var examples = {
 	}
 };
 
-test('can continue', function (t) {
-	if (process.env.NODE_NDEBUG)
-		t.fail('NODE_NDEBUG must be unset for this test to work!');
+var ndebug = process.env.NODE_NDEBUG;
+test('all.test setup', function (t) {
+	delete process.env.NODE_NDEBUG;
 	t.end();
 });
 
@@ -307,4 +306,9 @@ Object.keys(examples).forEach(function (type) {
 
 		t.end();
 	});
+});
+
+test('all.test teardown', function (t) {
+	process.env.NODE_NDEBUG = ndebug;
+	t.end();
 });
