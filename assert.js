@@ -9,6 +9,7 @@ var util = require('util');
 ///--- Globals
 
 var NDEBUG = process.env.NODE_NDEBUG || false;
+/* JSSTYLED */
 var UUID_REGEXP = /^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$/;
 
 
@@ -73,7 +74,7 @@ function _instanceof(arg, type, name, stackFunc) {
 
 function _getClass(object) {
         return (Object.prototype.toString.call(object).slice(8, -1));
-};
+}
 
 
 

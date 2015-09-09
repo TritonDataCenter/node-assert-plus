@@ -1,0 +1,6 @@
+Makefile
+deps
+tools
+tests
+.gitmodules
+.npmignore
