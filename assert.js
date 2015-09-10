@@ -37,39 +37,35 @@ function _() {
 
 
 function _assert(arg, type, name, stackFunc) {
-        if (!NDEBUG) {
-                name = name || type;
-                stackFunc = stackFunc || _assert.caller;
-                var t = typeof (arg);
+	name = name || type;
+	stackFunc = stackFunc || _assert.caller;
+	var t = typeof (arg);
 
-                if (t !== type) {
-                        throw new assert.AssertionError({
-                                message: _(TYPE_REQUIRED, name, type),
-                                actual: t,
-                                expected: type,
-                                operator: '===',
-                                stackStartFunction: stackFunc
-                        });
-                }
-        }
+	if (t !== type) {
+		throw new assert.AssertionError({
+			message: _(TYPE_REQUIRED, name, type),
+			actual: t,
+			expected: type,
+			operator: '===',
+			stackStartFunction: stackFunc
+		});
+	}
 }
 
 
 function _instanceof(arg, type, name, stackFunc) {
-        if (!NDEBUG) {
-                name = name || type;
-                stackFunc = stackFunc || _instanceof.caller;
+	name = name || type;
+	stackFunc = stackFunc || _instanceof.caller;
 
-                if (!(arg instanceof type)) {
-                        throw new assert.AssertionError({
-                                message: _(TYPE_REQUIRED, name, type.name),
-                                actual: _getClass(arg),
-                                expected: type.name,
-                                operator: 'instanceof',
-                                stackStartFunction: stackFunc
-                        });
-                }
-        }
+	if (!(arg instanceof type)) {
+		throw new assert.AssertionError({
+			message: _(TYPE_REQUIRED, name, type.name),
+			actual: _getClass(arg),
+			expected: type.name,
+			operator: 'instanceof',
+			stackStartFunction: stackFunc
+		});
+	}
 }
 
 function _getClass(object) {
@@ -81,23 +77,21 @@ function _getClass(object) {
 ///--- API
 
 function array(arr, type, name) {
-        if (!NDEBUG) {
-                name = name || type;
+	name = name || type;
 
-                if (!Array.isArray(arr)) {
-                        throw new assert.AssertionError({
-                                message: _(ARRAY_TYPE_REQUIRED, name, type),
-                                actual: typeof (arr),
-                                expected: 'array',
-                                operator: 'Array.isArray',
-                                stackStartFunction: array.caller
-                        });
-                }
+	if (!Array.isArray(arr)) {
+		throw new assert.AssertionError({
+			message: _(ARRAY_TYPE_REQUIRED, name, type),
+			actual: typeof (arr),
+			expected: 'array',
+			operator: 'Array.isArray',
+			stackStartFunction: array.caller
+		});
+	}
 
-                for (var i = 0; i < arr.length; i++) {
-                        _assert(arr[i], type, name, array);
-                }
-        }
+	for (var i = 0; i < arr.length; i++) {
+		_assert(arr[i], type, name, array);
+	}
 }
 
 
@@ -126,7 +120,7 @@ function func(arg, name) {
 
 function number(arg, name) {
         _assert(arg, 'number', name);
-        if (!NDEBUG && (isNaN(arg) || !isFinite(arg))) {
+        if (isNaN(arg) || !isFinite(arg)) {
                 throw new assert.AssertionError({
                         message: _(TYPE_REQUIRED, name, 'number'),
                         actual: arg,
@@ -164,7 +158,7 @@ function string(arg, name) {
 
 function uuid(arg, name) {
         string(arg, name);
-        if (!NDEBUG && !UUID_REGEXP.test(arg)) {
+        if (!UUID_REGEXP.test(arg)) {
                 throw new assert.AssertionError({
                         message: _(TYPE_REQUIRED, name, 'uuid'),
                         actual: 'string',
@@ -178,7 +172,7 @@ function uuid(arg, name) {
 
 ///--- Exports
 
-module.exports = {
+var funcs = {
         bool: bool,
         buffer: buffer,
         date: date,
@@ -192,7 +186,13 @@ module.exports = {
 };
 
 
-Object.keys(module.exports).forEach(function (k) {
+Object.keys(funcs).forEach(function (k) {
+	module.exports[k] = function () {
+		if (NDEBUG)
+			return;
+		funcs[k].apply(null, arguments);
+	};
+
         if (k === 'buffer')
                 return;
 
@@ -203,7 +203,9 @@ Object.keys(module.exports).forEach(function (k) {
         if (k === 'func')
                 k = 'function';
         module.exports[name] = function (arg, name) {
-                array(arg, k, name);
+		if (NDEBUG)
+			return;
+		array(arg, k, name);
         };
 });
 
