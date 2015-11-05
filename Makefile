@@ -10,7 +10,7 @@
 
 NPM = npm
 
-JS_FILES	:= assert.js
+JS_FILES	:= $(shell find assert.js tests/ -name '*.js')
 
 JSL_CONF	 = tools/jsl.node.conf
 JSSTYLE_FLAGS	 = -f tools/jsstyle.conf
@@ -30,7 +30,7 @@ clean:
 
 .PHONY: test
 test: install
-	echo Tests TBD
+	npm test
 
 .PHONY: check
 check: $(JSL_EXEC) $(JSSTYLE_EXEC)

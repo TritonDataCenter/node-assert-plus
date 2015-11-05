@@ -1,34 +1,35 @@
-var f = require('util').format;
+// Copyright 2015 Joyent, Inc.
 
+var assert = require('assert');
 var test = require('tape');
 
-var assertPlus = require('../');
 
-var ndebug = process.env.NODE_NDEBUG;
-test('ndebug.test setup', function (t) {
-	delete process.env.NODE_NDEBUG;
-	t.end();
+///--- Globals
+
+var regularExport;
+var ndebugExport;
+
+
+///--- Tests
+
+test('fake import', function (t) {
+    t.ifError(process.env.NODE_NDEBUG, 'run with NDEBUG off');
+
+    regularExport = require('../');
+    t.ok(regularExport);
+
+    /* fake setting NODE_NDEBUG */
+    ndebugExport = regularExport._setExports(true);
+    t.end();
 });
 
-test('ndebug', function (t) {
-	// ensure all exports on "assert-plus" that are functions
-	// result in nothing happening
-	Object.keys(assertPlus).forEach(function (key) {
-		if (key === 'AssertionError')
-			return;
+test('ndebug fucntions', function (t) {
+    t.throws(function () {
+        regularExport.fail('fail!');
+    });
 
-		// should not throw because NDEBUG
-		[undefined, null, {}, [], 'foo', 0, NaN].forEach(function (o) {
-			t.doesNotThrow(function() {
-				assertPlus[key](o);
-			}, f('assertPlus.%s(%s)', key, o));
-		});
-	});
-
-	t.end();
-});
-
-test('ndebug.test teardown', function (t) {
-	process.env.NODE_NDEBUG = ndebug;
-	t.end();
+    t.doesNotThrow(function () {
+        ndebugExport.fail('fail!');
+    });
+    t.end();
 });
