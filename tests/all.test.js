@@ -279,66 +279,90 @@ test('test setup', function (t) {
 Object.keys(examples).forEach(function (type) {
     var capType = capitalize(type);
 
-    test(f('testing type "%s" (valid)', type), function (t) {
-        var validArray = examples[type].valid;
+    /* test normal */
+    test(f('testing type "%s" (standard)', type), function (t) {
+        var name = type;
 
-        // test each individual member of the array explicitly
-        validArray.forEach(function (o) {
+        examples[type].valid.forEach(function (val) {
             t.doesNotThrow(function () {
-                assertPlus[type](o);
-            }, f('%s(%s) should succeed', type, o));
-
-            t.doesNotThrow(function () {
-                assertPlus['optional' + capType](o);
-            }, f('optional%s(%s) should succeed', capType, o));
-
-            t.doesNotThrow(function () {
-                assertPlus['optional' + capType](undefined);
-            }, f('optional%s(%s) should succeed',
-                 capType, 'undefined'));
+                assertPlus[name](val);
+            }, f('%s(%s) should succeed', name, val));
         });
 
-        // test the entire array with arrayOf* and optionalArrayOf*
-        t.doesNotThrow(function () {
-            assertPlus['arrayOf' + capType](validArray);
-        }, f('arrayOf%s(%s) should succeed', capType, validArray));
-
-        t.doesNotThrow(function () {
-            assertPlus['optionalArrayOf' + capType](validArray);
-        }, f('optionalArrayOf%s(%s) should succeed',
-             capType, validArray));
-
-        t.doesNotThrow(function () {
-            assertPlus['optionalArrayOf' + capType](undefined);
-        }, f('optionalArrayOf%s(%s should succeed)',
-             capType, 'undefined'));
+        examples[type].invalid.forEach(function (val) {
+            t.throws(function () {
+                assertPlus[name](val);
+            }, f('%s(%s) should throw', name, val));
+        });
 
         t.end();
     });
 
-    test(f('testing type "%s" (invalid)', type), function (t) {
-        var invalidArray = examples[type].invalid;
+    /* test optional */
+    test(f('testing type "%s" (optional)', type), function (t) {
+        var name = 'optional' + capType;
 
-        // test each individual member of the array explicitly
-        invalidArray.forEach(function (o) {
-            t.throws(function () {
-                assertPlus[type](o);
-            }, f('%s(%s) should throw', type, o));
+        examples[type].valid.forEach(function (val) {
+            t.doesNotThrow(function () {
+                assertPlus[name](val);
+            }, f('%s(%s) should succeed', name, val));
+        });
+        t.doesNotThrow(function () {
+            assertPlus[name](null);
+        }, f('%s(%s) should succeed', name, null));
+        t.doesNotThrow(function () {
+            assertPlus[name](undefined);
+        }, f('%s(%s) should succeed', name, undefined));
 
+        examples[type].invalid.forEach(function (val) {
+            /* null is valid for optional tests */
+            if (val === null) {
+                return;
+            }
             t.throws(function () {
-                assertPlus['optional' + capType](o);
-            }, f('optional%s(%s) should throw', capType, o));
+                assertPlus[name](val);
+            }, f('%s(%s) should throw', name, val));
         });
 
-        // test the entire array with arrayOf* and optionalArrayOf*
-        t.throws(function () {
-            assertPlus['arrayOf' + capType](invalidArray);
-        }, f('arrayOf%s(%s) should throw', capType, invalidArray));
+        t.end();
+    });
 
+    /* test arrayOf */
+    test(f('testing type "%s" (arrayOf)', type), function (t) {
+        var name = 'arrayOf' + capType;
+        var val = examples[type].valid;
+
+        t.doesNotThrow(function () {
+            assertPlus[name](val);
+        }, f('%s(%s) should succeed', name, val));
+
+        val = examples[type].invalid;
         t.throws(function () {
-            assertPlus['optionalArrayOf' + capType](invalidArray);
-        }, f('optionalArrayOf%s(%s) should throw',
-             capType, invalidArray));
+            assertPlus[name](val);
+        }, f('%s(%s) should throw', type, val));
+
+        t.end();
+    });
+
+    /* test optionalArrayOf */
+    test(f('testing type "%s" (optionalArrayOf)', type), function (t) {
+        var name = 'optionalArrayOf' + capType;
+        var val = examples[type].valid;
+
+        t.doesNotThrow(function () {
+            assertPlus[name](val);
+        }, f('%s(%s) should succeed', name, val));
+        t.doesNotThrow(function () {
+            assertPlus[name](null);
+        }, f('%s(%s) should succeed', name, null));
+        t.doesNotThrow(function () {
+            assertPlus[name](undefined);
+        }, f('%s(%s) should succeed', name, undefined));
+
+        val = examples[type].invalid;
+        t.throws(function () {
+            assertPlus[name](val);
+        }, f('%s(%s) should throw', type, val));
 
         t.end();
     });

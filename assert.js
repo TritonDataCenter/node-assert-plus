@@ -128,8 +128,9 @@ function _setExports(ndebug) {
         }
         var type = types[k];
         out[name] = function (arg, msg) {
-            if (arg === undefined)
+            if (arg === undefined || arg === null) {
                 return;
+            }
             if (!type.check(arg)) {
                 _toss(msg, k, type.operator, arg, type.actual);
             }
@@ -168,7 +169,7 @@ function _setExports(ndebug) {
         var type = types[k];
         var expected = '[' + k + ']';
         out[name] = function (arg, msg) {
-            if (arg === undefined) {
+            if (arg === undefined || arg === null) {
                 return;
             }
             if (!Array.isArray(arg)) {
