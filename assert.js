@@ -65,7 +65,7 @@ var types = {
     },
     array: {
         check: function (arg) { return Array.isArray(arg); },
-        operator: 'Buffer.isBuffer'
+        operator: 'Array.isArray'
     },
     stream: {
         check: function (arg) { return arg instanceof Stream; },
