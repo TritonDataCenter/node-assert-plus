@@ -4,7 +4,7 @@ var assert = require('assert');
 var test = require('tape');
 var assertPlus = require('../');
 
-test('exports', function (t) {
+test('standard asserts are exported', function (t) {
         t.equal(typeof (assertPlus), 'function');
 
         t.doesNotThrow(function () {

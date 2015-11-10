@@ -12,7 +12,7 @@ var ndebugExport;
 
 ///--- Tests
 
-test('fake import', function (t) {
+test('simulated import', function (t) {
     t.ifError(process.env.NODE_NDEBUG, 'run with NDEBUG off');
 
     regularExport = require('../');
@@ -23,7 +23,7 @@ test('fake import', function (t) {
     t.end();
 });
 
-test('ndebug fucntions', function (t) {
+test('assertions suppressed via ndebug', function (t) {
     t.throws(function () {
         regularExport.fail('fail!');
     });

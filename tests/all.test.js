@@ -280,7 +280,7 @@ Object.keys(examples).forEach(function (type) {
     var capType = capitalize(type);
 
     /* test normal */
-    test(f('testing type "%s" (standard)', type), function (t) {
+    test(f('assert.%s', type), function (t) {
         var name = type;
 
         examples[type].valid.forEach(function (val) {
@@ -299,7 +299,7 @@ Object.keys(examples).forEach(function (type) {
     });
 
     /* test optional */
-    test(f('testing type "%s" (optional)', type), function (t) {
+    test(f('assert.%s (optional)', type), function (t) {
         var name = 'optional' + capType;
 
         examples[type].valid.forEach(function (val) {
@@ -328,7 +328,7 @@ Object.keys(examples).forEach(function (type) {
     });
 
     /* test arrayOf */
-    test(f('testing type "%s" (arrayOf)', type), function (t) {
+    test(f('assert.%s (arrayOf)', type), function (t) {
         var name = 'arrayOf' + capType;
         var val = examples[type].valid;
 
@@ -345,7 +345,7 @@ Object.keys(examples).forEach(function (type) {
     });
 
     /* test optionalArrayOf */
-    test(f('testing type "%s" (optionalArrayOf)', type), function (t) {
+    test(f('assert.%s (optionalArrayOf)', type), function (t) {
         var name = 'optionalArrayOf' + capType;
         var val = examples[type].valid;
 
