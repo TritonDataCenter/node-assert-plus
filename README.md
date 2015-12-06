@@ -78,7 +78,7 @@ The complete list of APIs is:
 * assert.string
 * assert.stream
 * assert.date
-* assert.regex
+* assert.regexp
 * assert.uuid
 * assert.arrayOfArray
 * assert.arrayOfBool
