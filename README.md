@@ -91,6 +91,7 @@ The complete list of APIs is:
 * assert.arrayOfString
 * assert.arrayOfStream
 * assert.arrayOfDate
+* assert.arrayOfRegexp
 * assert.arrayOfUuid
 * assert.optionalArray
 * assert.optionalBool
@@ -102,6 +103,7 @@ The complete list of APIs is:
 * assert.optionalString
 * assert.optionalStream
 * assert.optionalDate
+* assert.optionalRegexp
 * assert.optionalUuid
 * assert.optionalArrayOfArray
 * assert.optionalArrayOfBool
@@ -113,6 +115,7 @@ The complete list of APIs is:
 * assert.optionalArrayOfString
 * assert.optionalArrayOfStream
 * assert.optionalArrayOfDate
+* assert.optionalArrayOfRegexp
 * assert.optionalArrayOfUuid
 * assert.AssertionError
 * assert.fail
