@@ -74,6 +74,7 @@ The complete list of APIs is:
 * assert.buffer
 * assert.func
 * assert.number
+* assert.finite
 * assert.object
 * assert.string
 * assert.stream
@@ -85,6 +86,7 @@ The complete list of APIs is:
 * assert.arrayOfBuffer
 * assert.arrayOfFunc
 * assert.arrayOfNumber
+* assert.arrayOfFinite
 * assert.arrayOfObject
 * assert.arrayOfString
 * assert.arrayOfStream
@@ -95,6 +97,7 @@ The complete list of APIs is:
 * assert.optionalBuffer
 * assert.optionalFunc
 * assert.optionalNumber
+* assert.optionalFinite
 * assert.optionalObject
 * assert.optionalString
 * assert.optionalStream
@@ -105,6 +108,7 @@ The complete list of APIs is:
 * assert.optionalArrayOfBuffer
 * assert.optionalArrayOfFunc
 * assert.optionalArrayOfNumber
+* assert.optionalArrayOfFinite
 * assert.optionalArrayOfObject
 * assert.optionalArrayOfString
 * assert.optionalArrayOfStream

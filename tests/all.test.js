@@ -143,6 +143,30 @@ var examples = {
             0,
             1,
             0.5,
+            Math.PI,
+            Infinity
+        ],
+        invalid: [
+            false,
+            true,
+            NaN,
+            'foo',
+            '00000000-0000-0000-0000-000000000000',
+            /regex/,
+            [],
+            {},
+            new Date(),
+            new Buffer(0),
+            new stream(),
+            function () {}
+        ]
+    },
+    finite: {
+        valid: [
+            -1,
+            0,
+            1,
+            0.5,
             Math.PI
         ],
         invalid: [
