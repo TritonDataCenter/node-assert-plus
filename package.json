@@ -2,7 +2,7 @@
   "author": "Mark Cavage <mcavage@gmail.com>",
   "name": "assert-plus",
   "description": "Extra assertions on top of node's assert module",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "license": "MIT",
   "main": "./assert.js",
   "devDependencies": {
