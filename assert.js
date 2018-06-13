@@ -1,5 +1,6 @@
-// Copyright (c) 2012, Mark Cavage. All rights reserved.
-// Copyright 2015 Joyent, Inc.
+/*
+ * Copyright (c) 2018, Joyent, Inc. and assert-plus authors
+ */
 
 var assert = require('assert');
 var Stream = require('stream').Stream;

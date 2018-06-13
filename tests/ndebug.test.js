@@ -1,4 +1,6 @@
-// Copyright 2015 Joyent, Inc.
+/*
+ * Copyright (c) 2018, Joyent, Inc. and assert-plus authors
+ */
 
 var assert = require('assert');
 var test = require('tape');
