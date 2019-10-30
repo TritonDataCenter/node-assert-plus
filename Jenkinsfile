@@ -1,4 +1,4 @@
-@Library('jenkins-joylib@v1.0.0') _
+@Library('jenkins-joylib@v1.0.2') _
 
 pipeline {
 
