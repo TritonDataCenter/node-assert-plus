@@ -209,4 +209,4 @@ function _setExports(ndebug) {
     return out;
 }
 
-module.exports = _setExports(process.env.NODE_NDEBUG);
+module.exports = _setExports(import.meta.env.NODE_NDEBUG);
